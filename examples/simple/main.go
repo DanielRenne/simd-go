@@ -39,7 +39,7 @@ func main() {
 	"SomeDate":"2012-04-23T18:25:43.511Z", 
 	"SomeBool": true, 
 	"SomeStruct":{"NestedString":"HelloNest", "NestedDate":"2013-04-23T19:25:43.511Z"}, 
-	"MapStruct":{"MyString":"testMap"},
+	"MapStruct":{"MyString":"testMap", "NestedMapStruct":{"MyInt":55555}},
 	"SomePointer":"I am a pointer", 
 	"IntArray": [1,2,3,4], 
 	"Int64Array": [20,30,40],

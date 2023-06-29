@@ -101,7 +101,18 @@ func unmarshalRecursive(i simdjson.Iter, structValue reflect.Value) error {
 					fieldValue.Set(reflect.ValueOf(val))
 				}
 			case reflect.Map:
-				log.Println("Need to Implement Map")
+				target := make(map[string]interface{})
+				obj, err := element.Iter.Object(nil)
+				if err == nil {
+					obj.ForEach(func(key []byte, i simdjson.Iter) {
+						inf, err := i.Interface()
+						if err == nil {
+							target[string(key)] = inf
+						}
+
+					}, nil)
+					fieldValue.Set(reflect.ValueOf(target))
+				}
 			case reflect.Struct:
 				if fieldValue.Type() == reflect.TypeOf(time.Time{}) {
 					val, err := element.Iter.StringCvt()
@@ -114,7 +125,6 @@ func unmarshalRecursive(i simdjson.Iter, structValue reflect.Value) error {
 				} else {
 					unmarshalRecursive(element.Iter, fieldValue)
 				}
-
 			case reflect.Slice:
 
 				underLyingType := reflect.TypeOf(fieldValue.Interface()).Elem()
