@@ -10,30 +10,30 @@ import (
 	"github.com/minio/simdjson-go"
 )
 
-// func Marshall(v any) (data []byte, err error) {
-// 	json.Marshal(v any)
-// }
+func Marshall(v any) (data []byte, err error) {
+	data, err = json.Marshal(v)
+	return
+}
 
 func Unmarshal(data []byte, v any) (err error) {
 
-	if simdjson.SupportedCPU() {
-
-		pj, errParse := simdjson.Parse(data, nil)
-		if errParse != nil {
-			err = errParse
-			return
-		}
-
-		// Iterate each top level element.
-		err = pj.ForEach(func(i simdjson.Iter) error {
-			fmt.Println("Got iterator for type:", i.Type())
-			return unmarshalRecursive(i, reflect.ValueOf(v).Elem())
-		})
-
+	if !simdjson.SupportedCPU() {
+		err = json.Unmarshal(data, v)
 		return
 	}
 
-	err = json.Unmarshal(data, v)
+	pj, errParse := simdjson.Parse(data, nil)
+	if errParse != nil {
+		err = errParse
+		return
+	}
+
+	// Iterate each top level element.
+	err = pj.ForEach(func(i simdjson.Iter) error {
+		fmt.Println("Got iterator for type:", i.Type())
+		return unmarshalRecursive(i, reflect.ValueOf(v).Elem())
+	})
+
 	return
 }
 
