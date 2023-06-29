@@ -16,14 +16,15 @@ type complexObj struct {
 		NestedString string    `json:"NestedString"`
 		NestedDate   time.Time `json:"NestedDate"`
 	} `json:"SomeStruct"`
-	SomePointer  *string                `json:"SomePointer"`
-	MapStruct    map[string]interface{} `json:"MapStruct"`
-	IntArray     []int                  `json:"IntArray"`
-	Int64Array   []int64                `json:"Int64Array"`
-	Float64Array []float64              `json:"Float64Array"`
-	StringArray  []string               `json:"StringArray"`
-	StructArray  []structArrayObj       `json:"StructArray"`
-	DateArray    []time.Time            `json:"DateArray"`
+	SomePointer  *string                  `json:"SomePointer"`
+	MapStruct    map[string]interface{}   `json:"MapStruct"`
+	IntArray     []int                    `json:"IntArray"`
+	Int64Array   []int64                  `json:"Int64Array"`
+	Float64Array []float64                `json:"Float64Array"`
+	StringArray  []string                 `json:"StringArray"`
+	StructArray  []structArrayObj         `json:"StructArray"`
+	DateArray    []time.Time              `json:"DateArray"`
+	MapArray     []map[string]interface{} `json:"MapArray"`
 }
 
 type structArrayObj struct {
@@ -46,7 +47,8 @@ func main() {
 	"Float64Array": [5.6999,7.6456582,9.1255454],
 	"StringArray":["Dan", "Dave", "Bob"],
 	"StructArray":[{"StructString":"Hello", "StructDate":"2016-04-23T19:25:43.511Z"},{"StructString":"World", "StructDate":"2018-04-23T19:25:43.511Z"}],
-	"DateArray":["2016-04-23T19:25:43.511Z","2018-04-23T19:25:43.511Z"]
+	"DateArray":["2016-04-23T19:25:43.511Z","2018-04-23T19:25:43.511Z"],
+	"MapArray":[{"TestObj1":"Value1"}, {"TestObj2":"Value2"}]
 	}`), &obj)
 
 	log.Printf("%+v", obj)

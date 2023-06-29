@@ -193,6 +193,37 @@ func unmarshalRecursive(i simdjson.Iter, structValue reflect.Value) error {
 					} else {
 						log.Println("Failed to parse Array of time strings:  " + err.Error())
 					}
+				} else if t.Kind() == reflect.Slice && underLyingType.Kind() == reflect.Map {
+
+					valArray, err := element.Iter.Array(nil)
+					if err == nil {
+
+						// // Create a new slice with the type of the array property
+						sliceType := reflect.SliceOf(underLyingType)
+						newSlice := reflect.MakeSlice(sliceType, 0, 0)
+
+						valArray.ForEach(func(arrayIter simdjson.Iter) {
+
+							target := make(map[string]interface{})
+							obj, err := arrayIter.Object(nil)
+							if err == nil {
+								obj.ForEach(func(key []byte, i simdjson.Iter) {
+									inf, err := i.Interface()
+									if err == nil {
+										target[string(key)] = inf
+									}
+
+								}, nil)
+							}
+
+							newSlice = reflect.Append(newSlice, reflect.ValueOf(target))
+						})
+
+						fieldValue.Set(newSlice)
+
+					} else {
+						log.Println("Failed to parse Array of struct:  " + err.Error())
+					}
 				} else if t.Kind() == reflect.Slice && underLyingType.Kind() == reflect.Struct {
 
 					valArray, err := element.Iter.Array(nil)
