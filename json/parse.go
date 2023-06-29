@@ -130,121 +130,124 @@ func unmarshalRecursive(i simdjson.Iter, structValue reflect.Value) error {
 				underLyingType := reflect.TypeOf(fieldValue.Interface()).Elem()
 
 				t := reflect.SliceOf(fieldValue.Type())
-				if t.Kind() == reflect.Slice && t.Elem() == reflect.TypeOf([]int{}) {
-					valArray, err := element.Iter.Array(nil)
-					if err == nil {
-						val, err := valArray.AsInteger()
+				if t.Kind() == reflect.Slice {
+					if t.Elem() == reflect.TypeOf([]int{}) {
+						valArray, err := element.Iter.Array(nil)
 						if err == nil {
-
-							intSlice := make([]int, len(val))
-							for i, v := range val {
-								intSlice[i] = int(v)
-							}
-							fieldValue.Set(reflect.ValueOf(intSlice))
-						}
-					} else {
-						log.Println("Failed to parse Array of int:  " + err.Error())
-					}
-				} else if t.Kind() == reflect.Slice && t.Elem() == reflect.TypeOf([]int64{}) {
-					valArray, err := element.Iter.Array(nil)
-					if err == nil {
-						val, err := valArray.AsInteger()
-						if err == nil {
-							fieldValue.Set(reflect.ValueOf(val))
-						}
-					} else {
-						log.Println("Failed to parse Array of int64:  " + err.Error())
-					}
-				} else if t.Kind() == reflect.Slice && t.Elem() == reflect.TypeOf([]float64{}) {
-					valArray, err := element.Iter.Array(nil)
-					if err == nil {
-						val, err := valArray.AsFloat()
-						if err == nil {
-							fieldValue.Set(reflect.ValueOf(val))
-						}
-					} else {
-						log.Println("Failed to parse Array of int64:  " + err.Error())
-					}
-				} else if t.Kind() == reflect.Slice && t.Elem() == reflect.TypeOf([]string{}) {
-					valArray, err := element.Iter.Array(nil)
-					if err == nil {
-						val, err := valArray.AsStringCvt()
-						if err == nil {
-							fieldValue.Set(reflect.ValueOf(val))
-						}
-					} else {
-						log.Println("Failed to parse Array of string:  " + err.Error())
-					}
-				} else if t.Kind() == reflect.Slice && t.Elem() == reflect.TypeOf([]time.Time{}) {
-					valArray, err := element.Iter.Array(nil)
-					if err == nil {
-						val, err := valArray.AsStringCvt()
-						if err == nil {
-
-							timeSlice := make([]time.Time, len(val))
-							for i, v := range val {
-								timeValue, err := time.Parse(time.RFC3339, v)
-								if err == nil {
-									timeSlice[i] = timeValue
-								}
-							}
-							fieldValue.Set(reflect.ValueOf(timeSlice))
-						}
-					} else {
-						log.Println("Failed to parse Array of time strings:  " + err.Error())
-					}
-				} else if t.Kind() == reflect.Slice && underLyingType.Kind() == reflect.Map {
-
-					valArray, err := element.Iter.Array(nil)
-					if err == nil {
-
-						// // Create a new slice with the type of the array property
-						sliceType := reflect.SliceOf(underLyingType)
-						newSlice := reflect.MakeSlice(sliceType, 0, 0)
-
-						valArray.ForEach(func(arrayIter simdjson.Iter) {
-
-							target := make(map[string]interface{})
-							obj, err := arrayIter.Object(nil)
+							val, err := valArray.AsInteger()
 							if err == nil {
-								obj.ForEach(func(key []byte, i simdjson.Iter) {
-									inf, err := i.Interface()
-									if err == nil {
-										target[string(key)] = inf
-									}
 
-								}, nil)
+								intSlice := make([]int, len(val))
+								for i, v := range val {
+									intSlice[i] = int(v)
+								}
+								fieldValue.Set(reflect.ValueOf(intSlice))
 							}
+						} else {
+							log.Println("Failed to parse Array of int:  " + err.Error())
+						}
+					} else if t.Elem() == reflect.TypeOf([]int64{}) {
+						valArray, err := element.Iter.Array(nil)
+						if err == nil {
+							val, err := valArray.AsInteger()
+							if err == nil {
+								fieldValue.Set(reflect.ValueOf(val))
+							}
+						} else {
+							log.Println("Failed to parse Array of int64:  " + err.Error())
+						}
+					} else if t.Elem() == reflect.TypeOf([]float64{}) {
+						valArray, err := element.Iter.Array(nil)
+						if err == nil {
+							val, err := valArray.AsFloat()
+							if err == nil {
+								fieldValue.Set(reflect.ValueOf(val))
+							}
+						} else {
+							log.Println("Failed to parse Array of int64:  " + err.Error())
+						}
+					} else if t.Elem() == reflect.TypeOf([]string{}) {
+						valArray, err := element.Iter.Array(nil)
+						if err == nil {
+							val, err := valArray.AsStringCvt()
+							if err == nil {
+								fieldValue.Set(reflect.ValueOf(val))
+							}
+						} else {
+							log.Println("Failed to parse Array of string:  " + err.Error())
+						}
+					} else if t.Elem() == reflect.TypeOf([]time.Time{}) {
+						valArray, err := element.Iter.Array(nil)
+						if err == nil {
+							val, err := valArray.AsStringCvt()
+							if err == nil {
 
-							newSlice = reflect.Append(newSlice, reflect.ValueOf(target))
-						})
+								timeSlice := make([]time.Time, len(val))
+								for i, v := range val {
+									timeValue, err := time.Parse(time.RFC3339, v)
+									if err == nil {
+										timeSlice[i] = timeValue
+									}
+								}
+								fieldValue.Set(reflect.ValueOf(timeSlice))
+							}
+						} else {
+							log.Println("Failed to parse Array of time strings:  " + err.Error())
+						}
+					} else if underLyingType.Kind() == reflect.Map {
 
-						fieldValue.Set(newSlice)
+						valArray, err := element.Iter.Array(nil)
+						if err == nil {
 
-					} else {
-						log.Println("Failed to parse Array of struct:  " + err.Error())
-					}
-				} else if t.Kind() == reflect.Slice && underLyingType.Kind() == reflect.Struct {
+							// // Create a new slice with the type of the array property
+							sliceType := reflect.SliceOf(underLyingType)
+							newSlice := reflect.MakeSlice(sliceType, 0, 0)
 
-					valArray, err := element.Iter.Array(nil)
-					if err == nil {
+							valArray.ForEach(func(arrayIter simdjson.Iter) {
 
-						// // Create a new slice with the type of the array property
-						sliceType := reflect.SliceOf(underLyingType)
-						newSlice := reflect.MakeSlice(sliceType, 0, 0)
+								target := make(map[string]interface{})
+								obj, err := arrayIter.Object(nil)
+								if err == nil {
+									obj.ForEach(func(key []byte, i simdjson.Iter) {
+										inf, err := i.Interface()
+										if err == nil {
+											target[string(key)] = inf
+										}
 
-						valArray.ForEach(func(arrayIter simdjson.Iter) {
-							obj := reflect.New(underLyingType).Elem()
-							unmarshalRecursive(arrayIter, obj)
-							newSlice = reflect.Append(newSlice, obj)
-						})
+									}, nil)
+								}
 
-						fieldValue.Set(newSlice)
+								newSlice = reflect.Append(newSlice, reflect.ValueOf(target))
+							})
 
-					} else {
-						log.Println("Failed to parse Array of struct:  " + err.Error())
+							fieldValue.Set(newSlice)
+
+						} else {
+							log.Println("Failed to parse Array of struct:  " + err.Error())
+						}
+					} else if underLyingType.Kind() == reflect.Struct {
+
+						valArray, err := element.Iter.Array(nil)
+						if err == nil {
+
+							// // Create a new slice with the type of the array property
+							sliceType := reflect.SliceOf(underLyingType)
+							newSlice := reflect.MakeSlice(sliceType, 0, 0)
+
+							valArray.ForEach(func(arrayIter simdjson.Iter) {
+								obj := reflect.New(underLyingType).Elem()
+								unmarshalRecursive(arrayIter, obj)
+								newSlice = reflect.Append(newSlice, obj)
+							})
+
+							fieldValue.Set(newSlice)
+
+						} else {
+							log.Println("Failed to parse Array of struct:  " + err.Error())
+						}
 					}
 				}
+
 			}
 
 		} else {
