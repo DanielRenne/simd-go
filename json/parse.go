@@ -22,24 +22,14 @@ func Unmarshal(data []byte, v any) (err error) {
 		if errParse != nil {
 			err = errParse
 			return
-
 		}
 
 		// Iterate each top level element.
 		err = pj.ForEach(func(i simdjson.Iter) error {
 			fmt.Println("Got iterator for type:", i.Type())
-
 			return unmarshalRecursive(i, reflect.ValueOf(v).Elem())
-
-			// element, err := i.FindElement(nil, "Image", "URL")
-			// if err == nil {
-			// 	value, _ := element.Iter.StringCvt()
-			// 	fmt.Println("Found element:", element.Name, "Type:", element.Type, "Value:", value)
-			// }
-			// return nil
 		})
 
-		// log.Printf("%+v", pj)
 		return
 	}
 
